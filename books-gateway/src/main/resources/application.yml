@@ -1,0 +1,52 @@
+server:
+  port: 8080
+
+spring:
+  # ----------- REDIS -----------
+  redis:
+    host: localhost
+    port: 6379
+
+  # ----------- RABBITMQ -----------
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
+
+# gRPC Client: ?????????, ??? ????????? Domain-??????
+grpc:
+  client:
+    domain-service:
+      # ???????????? ? gRPC-??????? Domain-??????? ?? localhost:9090
+      address: "static://localhost:9090"
+      negotiationType: plaintext
+
+app:
+  rabbit:
+    # ???????? ????????, ? ??????? ?????????? create/update/delete
+    exchange: booksExchange
+    create-queue: createBookQueue
+    update-queue: updateBookQueue
+    delete-queue: deleteBookQueue
+    create-routing-key: book.create.key
+    update-routing-key: book.update.key
+    delete-routing-key: book.delete.key
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
