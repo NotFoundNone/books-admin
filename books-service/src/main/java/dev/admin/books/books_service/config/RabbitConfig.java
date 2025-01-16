@@ -35,7 +35,7 @@ public class RabbitConfig {
         return new DirectExchange("booksExchange");
     }
 
-    // CREATE Queue и Binding
+    // CREATE
     @Bean
     public Queue createBookQueue() {
         return new Queue("createBookQueue", true);
@@ -46,7 +46,7 @@ public class RabbitConfig {
         return BindingBuilder.bind(createBookQueue).to(bookExchange).with("book.create.key");
     }
 
-    // UPDATE Queue и Binding
+    // UPDATE
     @Bean
     public Queue updateBookQueue() {
         return new Queue("updateBookQueue", true);
@@ -57,7 +57,7 @@ public class RabbitConfig {
         return BindingBuilder.bind(updateBookQueue).to(bookExchange).with("book.update.key");
     }
 
-    // DELETE Queue и Binding
+    // DELETE
     @Bean
     public Queue deleteBookQueue() {
         return new Queue("deleteBookQueue", true);

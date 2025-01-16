@@ -2,6 +2,17 @@ server:
   port: 8080
 
 spring:
+
+  cloud:
+    gateway:
+      routes:
+        - id: books-route
+          uri: http://domain-service:8081/books
+          predicates:
+            - Path=/books/**
+          filters:
+            - name: RedisCacheFilter
+
   # ----------- REDIS -----------
   redis:
     host: localhost
@@ -11,20 +22,18 @@ spring:
   rabbitmq:
     host: localhost
     port: 5672
-    username: admin
-    password: admin
+    username: user
+    password: password
+    virtual-host: vhost
 
-# gRPC Client: ?????????, ??? ????????? Domain-??????
 grpc:
   client:
     domain-service:
-      # ???????????? ? gRPC-??????? Domain-??????? ?? localhost:9090
-      address: "static://localhost:9090"
+      address: "static://localhost:9091"
       negotiationType: plaintext
 
 app:
   rabbit:
-    # ???????? ????????, ? ??????? ?????????? create/update/delete
     exchange: booksExchange
     create-queue: createBookQueue
     update-queue: updateBookQueue

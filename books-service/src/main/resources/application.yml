@@ -1,23 +1,25 @@
 server:
-  # Возможно, у вас нет обычного Tomcat, если сервис работает только как gRPC,
-  # но если всё же нужен Spring Web, укажите порт (или уберите, если не нужен).
   port: 8081
 
 grpc:
   server:
-    port: 9090         # Domain-сервис будет слушать gRPC здесь
+    port: 9091
 
 spring:
   data:
     mongodb:
-      # Подключение к локально запущенному Mongo
-      uri: mongodb://localhost:27017/newdb
+      host: localhost
+      port: 27017
+      database: newdb
+      username: root
+      password: example
 
   rabbitmq:
     host: localhost
     port: 5672
-    username: admin
-    password: admin
+    username: user
+    password: password
+    virtual-host: vhost
 
 logging:
   level:

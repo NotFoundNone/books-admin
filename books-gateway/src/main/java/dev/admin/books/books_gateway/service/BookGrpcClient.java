@@ -4,18 +4,25 @@ package dev.admin.books.books_gateway.service;
 import dev.admin.books.*;
 import dev.admin.books.books_gateway.dto.BookDto;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 public class BookGrpcClient {
 
     private BookServiceGrpc.BookServiceBlockingStub bookServiceStub;
-    // "domain-service" - это имя, которое настраивается в application.yml (см. ниже),
-    // чтобы gRPC-стартер понимал, куда слать запрос (host/port).
 
+    @Autowired
+    public BookGrpcClient(BookServiceGrpc.BookServiceBlockingStub bookServiceStub) {
+        this.bookServiceStub = bookServiceStub;
+    }
+
+//    @Cacheable(value = "all-books-cache")
     public List<BookDto> getAllBooks() {
         BookListResponse response = bookServiceStub.getAllBooks(EmptyRequest.getDefaultInstance());
         return response.getBooksList().stream()
@@ -23,6 +30,7 @@ public class BookGrpcClient {
                 .collect(Collectors.toList());
     }
 
+//    @Cacheable(value = "book-cache", key = "#id")
     public BookDto getBookById(String id) {
         GetBookRequest request = GetBookRequest.newBuilder().setId(id).build();
         BookResponse response = bookServiceStub.getBookById(request);

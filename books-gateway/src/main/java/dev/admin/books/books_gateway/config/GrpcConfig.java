@@ -11,8 +11,8 @@ public class GrpcConfig {
 
     @Bean
     public ManagedChannel grpcChannel() {
-        return ManagedChannelBuilder.forAddress("localhost", 9090) // Замените адрес и порт на ваши настройки
-                .usePlaintext() // Используйте TLS, если требуется
+        return ManagedChannelBuilder.forAddress("localhost", 9091)
+                .usePlaintext()
                 .build();
     }
 
