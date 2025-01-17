@@ -61,15 +61,15 @@ services:
     ports:
       - "27017:27017"
     environment:
-      - SPRING_DATA_MONGODB_USERNAME=root
-      - SPRING_DATA_MONGODB_PASSWORD=example
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
     volumes:
       - mongo_data:/data/db
     networks:
       - app-network
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
+    image: elastic/elasticsearch:7.17.10
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false # Убирает требование авторизации
@@ -79,7 +79,7 @@ services:
       - app-network
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:7.17.0
+    image: elastic/logstash:7.17.0
     volumes:
       - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
     ports:
@@ -90,7 +90,7 @@ services:
       - app-network
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.17.0
+    image: elastic/kibana:7.17.0
     ports:
       - "5601:5601"
     depends_on:
