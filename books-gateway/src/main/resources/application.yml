@@ -7,20 +7,22 @@ spring:
     gateway:
       routes:
         - id: books-route
-          uri: http://domain-service:8081/books
+          uri: http://books-service:8081/books
           predicates:
             - Path=/books/**
           filters:
             - name: RedisCacheFilter
 
   # ----------- REDIS -----------
-  redis:
-    host: localhost
-    port: 6379
+  data:
+    redis:
+      host: redis # Имя сервиса Redis в docker-compose.yml
+      port: 6379
+      password: password
 
   # ----------- RABBITMQ -----------
   rabbitmq:
-    host: localhost
+    host: rabbitmq # Имя сервиса RabbitMQ в docker-compose.yml
     port: 5672
     username: user
     password: password
@@ -29,7 +31,7 @@ spring:
 grpc:
   client:
     domain-service:
-      address: "static://localhost:9091"
+      address: "static://domain:9091" # Имя сервиса Domain в docker-compose.yml
       negotiationType: plaintext
 
 app:
@@ -41,6 +43,7 @@ app:
     create-routing-key: book.create.key
     update-routing-key: book.update.key
     delete-routing-key: book.delete.key
+
 management:
   endpoints:
     web:

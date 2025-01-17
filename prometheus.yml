@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 15s # Частота сбора метрик
+
+scrape_configs:
+  - job_name: 'spring-app'
+    metrics_path: '/actuator/prometheus' # Путь к метрикам Spring Boot Actuator
+    static_configs:
+      - targets: ['host.docker.internal:8080'] #хост и порт приложения

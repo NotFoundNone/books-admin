@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>dev.admin.books</groupId>
 	<artifactId>books-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>books-service</name>
 	<description>Domain Sevice for Books</description>
 	<url/>
@@ -97,6 +97,8 @@
 
 	<build>
 
+
+
 		<extensions>
 			<extension>
 				<groupId>kr.motd.maven</groupId>
@@ -106,6 +108,14 @@
 		</extensions>
 
 		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>dev.admin.books.books_service.BooksServiceApplication</mainClass>
+				</configuration>
+			</plugin>
+
 			<plugin>
 				<groupId>org.xolstice.maven.plugins</groupId>
 				<artifactId>protobuf-maven-plugin</artifactId>
