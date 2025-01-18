@@ -1,5 +1,6 @@
 package dev.admin.books.books_service.config;
 
+import dev.admin.books.books_service.util.ProtobufMessageConverter;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -11,25 +12,22 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitConfig {
 
-    // Конвертер сообщений JSON
     @Bean
-    public MessageConverter jsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
+    public MessageConverter protobufMessageConverter() {
+        return new ProtobufMessageConverter();
     }
 
-    // Конфигурация RabbitListener
     @Bean
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(
             ConnectionFactory connectionFactory,
-            MessageConverter jsonMessageConverter
+            MessageConverter protobufMessageConverter
     ) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
-        factory.setMessageConverter(jsonMessageConverter);
+        factory.setMessageConverter(protobufMessageConverter);
         return factory;
     }
 
-    // Exchange
     @Bean
     public DirectExchange bookExchange() {
         return new DirectExchange("booksExchange");

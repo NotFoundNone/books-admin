@@ -1,5 +1,7 @@
 package dev.admin.books.books_service.rabbit;
 
+import com.example.bookproto.BookResponse;
+import com.example.bookproto.DeleteBookMessage;
 import dev.admin.books.books_service.dto.BookDto;
 import dev.admin.books.books_service.entity.BookEntity;
 import dev.admin.books.books_service.service.BookService;
@@ -16,38 +18,36 @@ public class BookRabbitListener {
     }
 
     @RabbitListener(queues = "createBookQueue")
-    public void handleCreateBook(BookDto bookDto) {
-        // При создании ID может не быть (Mongo сгенерирует автоматически)
+    public void handleCreateBook(BookResponse book) {
         BookEntity entity = new BookEntity(
             null,
-            bookDto.getTitle(),
-            bookDto.getAuthor(),
-            bookDto.getGenre(),
-            bookDto.getYear()
+            book.getTitle(),
+            book.getAuthor(),
+            book.getGenre(),
+            book.getYear()
         );
         bookService.createBook(entity);
     }
 
     @RabbitListener(queues = "updateBookQueue")
-    public void handleUpdateBook(BookDto bookDto) {
-        if (bookDto.getId() == null || bookDto.getId().isEmpty()) {
-            // Логика, если не указан ID
+    public void handleUpdateBook(BookResponse book) {
+        if (book.getId() == null || book.getId().isEmpty()) {
             return;
         }
         BookEntity entity = new BookEntity(
-            bookDto.getId(),
-            bookDto.getTitle(),
-            bookDto.getAuthor(),
-            bookDto.getGenre(),
-            bookDto.getYear()
+                book.getId(),
+                book.getTitle(),
+                book.getAuthor(),
+                book.getGenre(),
+                book.getYear()
         );
         bookService.updateBook(entity);
     }
 
     @RabbitListener(queues = "deleteBookQueue")
-    public void handleDeleteBook(String id) {
-        if (id != null && !id.isEmpty()) {
-            bookService.deleteBook(id);
+    public void handleDeleteBook(DeleteBookMessage deleteMessage) {
+        if (deleteMessage != null) {
+            bookService.deleteBook(deleteMessage.getId());
         }
     }
 }

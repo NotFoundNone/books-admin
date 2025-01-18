@@ -22,6 +22,10 @@ message BookListResponse {
   repeated BookResponse books = 1;
 }
 
+message DeleteBookMessage {
+  string id = 1;
+}
+
 message BookResponse {
   string id = 1;
   string title = 2;

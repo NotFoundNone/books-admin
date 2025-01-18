@@ -1,5 +1,6 @@
 package dev.admin.books.books_gateway.config;
 
+import dev.admin.books.books_gateway.util.ProtobufMessageConverter;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -18,11 +19,10 @@ public class RabbitMQConfig {
 
     @Bean
     public RabbitTemplate rabbitTemplate(
-            ConnectionFactory connectionFactory,
-            MessageConverter jsonMessageConverter
+            ConnectionFactory connectionFactory
     ) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
-        template.setMessageConverter(jsonMessageConverter);
+        template.setMessageConverter(new ProtobufMessageConverter());
         return template;
     }
 

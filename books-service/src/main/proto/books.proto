@@ -5,10 +5,8 @@ option java_package = "com.example.bookproto";
 option java_outer_classname = "BookProto";
 
 service BookService {
-  // Получить книгу по ID (GET /books/{id})
   rpc GetBookById(GetBookRequest) returns (BookResponse);
 
-  // Получить все книги (GET /books)
   rpc GetAllBooks(EmptyRequest) returns (BookListResponse);
 }
 
@@ -20,6 +18,10 @@ message EmptyRequest {}
 
 message BookListResponse {
   repeated BookResponse books = 1;
+}
+
+message DeleteBookMessage {
+  string id = 1;
 }
 
 message BookResponse {

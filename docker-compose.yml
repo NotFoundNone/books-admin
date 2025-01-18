@@ -1,6 +1,4 @@
-version: '3.8'
 services:
-
   gateway:
     build:
       context: ./books-gateway
@@ -10,7 +8,6 @@ services:
       - SPRING_REDIS_HOST=redis
       - SPRING_RABBITMQ_HOST=rabbitmq
       - SPRING_GRPC_CLIENT_DOMAIN_SERVICE_ADDRESS=static://domain:9091
-      - SPRING_REDIS_HOST=redis
       - SPRING_REDIS_PORT=6379
     depends_on:
       - redis
@@ -36,6 +33,7 @@ services:
       - rabbitmq
     networks:
       - app-network
+    restart: unless-stopped
 
   redis:
     image: redis:alpine
@@ -44,6 +42,12 @@ services:
     networks:
       - app-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   rabbitmq:
     image: rabbitmq:3-management
     ports:
@@ -55,6 +59,12 @@ services:
       - RABBITMQ_DEFAULT_VHOST=vhost
     networks:
       - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   mongo:
     image: mongo:5.0
@@ -67,16 +77,51 @@ services:
       - mongo_data:/data/db
     networks:
       - app-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.runCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  mongo-express:
+    image: mongo-express:latest
+    ports:
+      - "8082:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=example
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   elasticsearch:
     image: elastic/elasticsearch:7.17.10
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=false # Убирает требование авторизации
+      - xpack.security.enabled=false # Отключает требования авторизации
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m # Настройка памяти (может быть изменена при необходимости)
     ports:
       - "9200:9200"
+      - "9300:9300"
     networks:
       - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   logstash:
     image: elastic/logstash:7.17.0
@@ -84,10 +129,12 @@ services:
       - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
     ports:
       - "5044:5044"
+      - "9600:9600"
     depends_on:
       - elasticsearch
     networks:
       - app-network
+    restart: unless-stopped
 
   kibana:
     image: elastic/kibana:7.17.0
@@ -97,6 +144,12 @@ services:
       - elasticsearch
     networks:
       - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5601/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   prometheus:
     image: prom/prometheus
@@ -106,6 +159,7 @@ services:
       - "9090:9090"
     networks:
       - app-network
+    restart: unless-stopped
 
   grafana:
     image: grafana/grafana
@@ -113,9 +167,16 @@ services:
       - "3000:3000"
     networks:
       - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
 volumes:
   mongo_data:
 
 networks:
   app-network:
+    driver: bridge

@@ -1,5 +1,7 @@
 package dev.admin.books.books_gateway.producer;
 
+import dev.admin.books.BookResponse;
+import dev.admin.books.DeleteBookMessage;
 import dev.admin.books.books_gateway.dto.BookDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +32,13 @@ public class BookProducer {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void sendCreateBook(BookDto dto) {
+    public void sendCreateBook(BookResponse dto) {
         LOGGER.info("Sending create message: {} to exchange: {} with routing key: {}", dto, exchange, createRoutingKey);
         rabbitTemplate.convertAndSend(exchange, createRoutingKey, dto);
         LOGGER.info("Message sent successfully to exchange: {} with routing key: {}", exchange, createRoutingKey);
     }
 
-    public void sendUpdateBook(BookDto dto) {
+    public void sendUpdateBook(BookResponse dto) {
         LOGGER.info("Sending update message: {} to exchange: {} with routing key: {}", dto, exchange, updateRoutingKey);
         rabbitTemplate.convertAndSend(exchange, updateRoutingKey, dto);
         LOGGER.info("Message sent successfully to exchange: {} with routing key: {}", exchange, updateRoutingKey);
@@ -44,7 +46,10 @@ public class BookProducer {
 
     public void sendDeleteBook(String id) {
         LOGGER.info("Sending delete message for ID: {} to exchange: {} with routing key: {}", id, exchange, deleteRoutingKey);
-        rabbitTemplate.convertAndSend(exchange, deleteRoutingKey, id);
+        DeleteBookMessage deleteMessage = DeleteBookMessage.newBuilder()
+                .setId(id)
+                .build();
+        rabbitTemplate.convertAndSend(exchange, deleteRoutingKey, deleteMessage);
         LOGGER.info("Message sent successfully to exchange: {} with routing key: {}", exchange, deleteRoutingKey);
     }
 }
