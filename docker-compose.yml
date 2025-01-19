@@ -110,7 +110,7 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false # Отключает требования авторизации
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m # Настройка памяти (может быть изменена при необходимости)
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
     ports:
       - "9200:9200"
       - "9300:9300"

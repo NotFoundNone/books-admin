@@ -17,6 +17,7 @@ public class BookRabbitListener {
         this.bookService = bookService;
     }
 
+    //TODO: тоже вынести в енфайронмент
     @RabbitListener(queues = "createBookQueue")
     public void handleCreateBook(BookResponse book) {
         BookEntity entity = new BookEntity(

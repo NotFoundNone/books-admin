@@ -15,8 +15,8 @@ public class BookGatewayService {
     private static final Logger LOGGER = LoggerFactory.getLogger(BookGatewayService.class);
 
     private final BookGrpcClient bookGrpcClient;
-    private final BookCacheService cacheService; // сервис для Redis кеша
-    private final BookProducer bookProducer;     // сервис для отправки RabbitMQ
+    private final BookCacheService cacheService;
+    private final BookProducer bookProducer;
 
     public BookGatewayService(BookGrpcClient bookGrpcClient,
                               BookCacheService cacheService,
@@ -63,7 +63,7 @@ public class BookGatewayService {
 
     public void createBookAsync(BookDto dto) {
         bookProducer.sendCreateBook(BookMapper.toBookResponse(dto));
-        // Можно очистить/инвалидировать кэш getAllBooks
+        // Чистим кэш getAllBooks
         cacheService.evictAllBooksCache();
     }
 

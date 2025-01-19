@@ -22,10 +22,7 @@ public class BooksServiceApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		System.out.println("!!!!!");
-		LOGGER.info("gRPC start!!!");
 		grpcServer.start();
 		grpcServer.awaitTermination();
 	}
-
 }

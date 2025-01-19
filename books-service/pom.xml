@@ -22,10 +22,11 @@
 	</developers>
 	<properties>
 		<java.version>17</java.version>
-		<grpc.version>1.42.2</grpc.version> <!-- Используем более новую версию -->
+		<grpc.version>1.42.2</grpc.version>
 		<protobuf.version>3.21.12</protobuf.version>
 	</properties>
 	<dependencies>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
@@ -44,6 +45,11 @@
 		</dependency>
 
 		<!-- gRPC Dependencies -->
+		<dependency>
+			<groupId>net.devh</groupId>
+			<artifactId>grpc-spring-boot-starter</artifactId>
+			<version>2.13.1.RELEASE</version>
+		</dependency>
 		<dependency>
 			<groupId>io.grpc</groupId>
 			<artifactId>grpc-netty-shaded</artifactId>
@@ -65,18 +71,11 @@
 			<version>${protobuf.version}</version>
 		</dependency>
 
-		<!-- Spring Boot gRPC Starter -->
-		<dependency>
-			<groupId>net.devh</groupId>
-			<artifactId>grpc-spring-boot-starter</artifactId>
-			<version>2.13.1.RELEASE</version>
-		</dependency>
-
-		<!-- Для преобразования JSON (классический Jackson) -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -96,9 +95,6 @@
 	</dependencies>
 
 	<build>
-
-
-
 		<extensions>
 			<extension>
 				<groupId>kr.motd.maven</groupId>
@@ -136,5 +132,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

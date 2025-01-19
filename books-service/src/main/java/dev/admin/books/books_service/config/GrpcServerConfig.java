@@ -13,6 +13,7 @@ public class GrpcServerConfig {
     @Autowired
     private BookGrpcService bookGrpcService;
 
+    //TODO: вынести в енвайронмент
     @Bean
     public Server grpcServer() throws Exception {
         return ServerBuilder.forPort(9091)

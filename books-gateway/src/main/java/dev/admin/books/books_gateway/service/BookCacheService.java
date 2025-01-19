@@ -2,6 +2,8 @@ package dev.admin.books.books_gateway.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.admin.books.books_gateway.dto.BookDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,8 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class BookCacheService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BookCacheService.class);
+
     private static final String BOOK_CACHE_KEY_PREFIX = "book_";
     private static final String ALL_BOOKS_KEY = "all_books";
 
@@ -22,49 +26,68 @@ public class BookCacheService {
         this.redisTemplate = redisTemplate;
     }
 
-    // Кэшируем список всех книг
     public void cacheAllBooks(List<BookDto> books) {
-        redisTemplate.opsForValue().set(ALL_BOOKS_KEY, books, 1, TimeUnit.MINUTES);
+        try {
+            redisTemplate.opsForValue().set(ALL_BOOKS_KEY, books, 1, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to cache all books: {}", e.getMessage(), e);
+        }
     }
 
-    // Получить список книг из кэша
     @SuppressWarnings("unchecked")
     public List<BookDto> getAllBooksFromCache() {
-        Object obj = redisTemplate.opsForValue().get(ALL_BOOKS_KEY);
-        if (obj instanceof List) {
-            return (List<BookDto>) obj;
+        try {
+            Object obj = redisTemplate.opsForValue().get(ALL_BOOKS_KEY);
+            if (obj instanceof List) {
+                return (List<BookDto>) obj;
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Failed to get all books from cache: {}", e.getMessage(), e);
         }
         return null;
     }
 
-    // Кэшируем одну книгу
     public void cacheBook(BookDto dto) {
         if (dto.getId() == null) return;
         String cacheKey = BOOK_CACHE_KEY_PREFIX + dto.getId();
-        redisTemplate.opsForValue().set(cacheKey, dto, 1, TimeUnit.MINUTES);
+        try {
+            redisTemplate.opsForValue().set(cacheKey, dto, 1, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to cache book with ID {}: {}", dto.getId(), e.getMessage(), e);
+        }
     }
 
-    // Получить одну книгу
     public BookDto getBookFromCache(String id) {
         String cacheKey = BOOK_CACHE_KEY_PREFIX + id;
-        Object obj = redisTemplate.opsForValue().get(cacheKey);
-        if (obj instanceof LinkedHashMap) {
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.convertValue(obj, BookDto.class);
-        }
-        if (obj instanceof BookDto) {
-            return (BookDto) obj;
+        try {
+            Object obj = redisTemplate.opsForValue().get(cacheKey);
+            if (obj instanceof LinkedHashMap) {
+                ObjectMapper mapper = new ObjectMapper();
+                return mapper.convertValue(obj, BookDto.class);
+            }
+            if (obj instanceof BookDto) {
+                return (BookDto) obj;
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Failed to get book with ID {} from cache: {}", id, e.getMessage(), e);
         }
         return null;
     }
 
-    // Сбросить кеш одной книги
     public void evictBookCache(String id) {
-        redisTemplate.delete(BOOK_CACHE_KEY_PREFIX + id);
+        String cacheKey = BOOK_CACHE_KEY_PREFIX + id;
+        try {
+            redisTemplate.delete(cacheKey);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to evict cache for book with ID {}: {}", id, e.getMessage(), e);
+        }
     }
 
-    // Сбросить кеш списка всех книг
     public void evictAllBooksCache() {
-        redisTemplate.delete(ALL_BOOKS_KEY);
+        try {
+            redisTemplate.delete(ALL_BOOKS_KEY);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to evict all books cache: {}", e.getMessage(), e);
+        }
     }
 }

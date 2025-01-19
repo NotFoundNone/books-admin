@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class GrpcConfig {
 
+    //TODO: вынести в енвайронмент
     @Bean
     public ManagedChannel grpcChannel() {
         return ManagedChannelBuilder.forAddress("domain", 9091)

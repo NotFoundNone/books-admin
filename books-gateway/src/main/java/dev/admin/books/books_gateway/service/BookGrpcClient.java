@@ -22,7 +22,6 @@ public class BookGrpcClient {
         this.bookServiceStub = bookServiceStub;
     }
 
-//    @Cacheable(value = "all-books-cache")
     public List<BookDto> getAllBooks() {
         BookListResponse response = bookServiceStub.getAllBooks(EmptyRequest.getDefaultInstance());
         return response.getBooksList().stream()
@@ -30,7 +29,6 @@ public class BookGrpcClient {
                 .collect(Collectors.toList());
     }
 
-//    @Cacheable(value = "book-cache", key = "#id")
     public BookDto getBookById(String id) {
         GetBookRequest request = GetBookRequest.newBuilder().setId(id).build();
         BookResponse response = bookServiceStub.getBookById(request);

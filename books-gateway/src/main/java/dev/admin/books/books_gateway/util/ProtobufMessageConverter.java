@@ -2,6 +2,7 @@ package dev.admin.books.books_gateway.util;
 
 import com.google.protobuf.Message;
 import dev.admin.books.BookResponse;
+import dev.admin.books.DeleteBookMessage;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.support.converter.MessageConversionException;
 import org.springframework.amqp.support.converter.MessageConverter;
@@ -17,6 +18,7 @@ public class ProtobufMessageConverter implements MessageConverter {
         byte[] bytes = protobufMessage.toByteArray();
         messageProperties.setContentType("application/x-protobuf");
         messageProperties.setContentLength(bytes.length);
+        messageProperties.setHeader("protobuf-type", protobufMessage.getClass().getSimpleName());
         return new org.springframework.amqp.core.Message(bytes, messageProperties);
     }
 
@@ -27,7 +29,16 @@ public class ProtobufMessageConverter implements MessageConverter {
             if (!"application/x-protobuf".equals(contentType)) {
                 throw new MessageConversionException("Unsupported content type: " + contentType);
             }
-            return BookResponse.parseFrom(message.getBody());
+
+            String protobufType = (String) message.getMessageProperties().getHeaders().get("protobuf-type");
+
+            if ("BookResponse".equals(protobufType)) {
+                return BookResponse.parseFrom(message.getBody());
+            } else if ("DeleteBookMessage".equals(protobufType)) {
+                return DeleteBookMessage.parseFrom(message.getBody());
+            } else {
+                throw new MessageConversionException("Unknown protobuf type: " + protobufType);
+            }
 
         } catch (Exception e) {
             throw new MessageConversionException("Failed to convert Protobuf message", e);
